@@ -1,0 +1,120 @@
+#OS junk files
+[Tt]humbs.db
+*.DS_Store
+
+#Custom ignore files
+/artifactory.properties
+artifactory.properties
+
+#Android project defaults
+*.iml
+.gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.idea/gradle.xml
+.idea/kotlinc.xml
+.idea/markdown.xml
+.idea/migrations.xml
+.idea/misc.xml
+.idea/studiobot.xml
+.idea/valkyrie_settings.xml
+.idea/.name
+.idea/appInsightsSettings.xml
+.idea/artifacts/
+.idea/compiler.xml
+.idea/deploymentTargetSelector.xml
+.idea/runConfigurations.xml
+.idea/vcs.xml
+
+#XCode project defaults
+**xcuserdata
+
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+#jbehave/idea
+*.swp
+*~
+*.log
+target/
+build/
+gen-*/
+bin/
+*.ipr
+*.iml
+*.iws
+**/ConfigRoot
+
+#Jetbrains Fleet
+fleetDistribution/
+
+#Visual Studio files
+*.[Oo]bj
+*.pdb
+*.user
+*.aps
+*.pch
+*.vspscc
+*.vssscc
+*_i.c
+*_p.c
+*.ncb
+*.suo
+*.tlb
+*.tlh
+*.bak
+*.[Cc]ache
+*.ilk
+*.log
+*.lib
+*.sbr
+*.sdf
+ipch/
+obj/
+[Bb]in
+#[Dd]ebug*/
+[Rr]elease*/
+[Tt]arget/
+Ankh.NoLoad
+
+# fastlane
+fastlane/report.xml
+fastlane/metadata_alpha
+fastlane/metadata_beta
+fastlane/metadata_stage
+fastlane/metadata_demo
+fastlane/metadata_ga
+fastlane/metadata_prod
+fastlane/gittag.txt
+/errorDetails.txt
+
+
+#Tooling
+_ReSharper*/
+*.user
+[Tt]est[Rr]esult*
+
+#Project files
+[Oo]utput/
+
+#Subversion files
+.svn
+
+# Office Temp Files
+~$*
+
+# Vi editor files
+.*.sw[op]
+
+*_output
+
+target
