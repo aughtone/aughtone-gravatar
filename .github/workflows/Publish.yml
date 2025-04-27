@@ -2,8 +2,10 @@
 
 name: Publish
 on:
-  release:
-    types: [released, prereleased]
+  push:
+    branches: [ "main" ]
+#  release:
+#    types: [released, prereleased]
 jobs:
   publish:
     name: Release build and publish
