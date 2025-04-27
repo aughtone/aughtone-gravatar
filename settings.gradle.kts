@@ -22,10 +22,11 @@ dependencyResolutionManagement {
             }
         }
         mavenCentral()
+        mavenLocal()
     }
 }
 
-rootProject.name = "library"
+rootProject.name = "aughtone-gravatar"
 
-include(":library")
+include(":gravatar")
 //include(":composeApp")
