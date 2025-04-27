@@ -4,5 +4,4 @@ plugins {
     alias(libs.plugins.vanniktech.mavenPublish) apply false
     alias(libs.plugins.androidApplication) apply false
     alias(libs.plugins.kotlinAndroid) apply false
-
 }
