@@ -118,3 +118,5 @@ _ReSharper*/
 *_output
 
 target
+AndroidProjectSystem.xml
+.idea
