@@ -1,7 +1,7 @@
 [versions]
 namespace = "io.github.aughtone"
 applicationId = "io.github.aughtone.gravatar"
-versionName = "1.0.1"
+versionName = "1.0.2"
 versionNameSiffix = "-alpha3"
 minSdk = "24"
 compileSdk = "37"
