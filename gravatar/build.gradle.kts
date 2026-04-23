@@ -1,29 +1,26 @@
-import com.vanniktech.maven.publish.SonatypeHost
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompileCommon
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.multiplatformLibrary)
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.vanniktech.mavenPublish)
 }
 
 group = "io.github.aughtone"
-version = "${libs.versions.versionName.get().toString()}${
-    libs.versions.versionNameSiffix.get().toString()
-}"
+version = libs.versions.versionName.get()
 
 kotlin {
+    jvmToolchain(17)
     jvm()
-    androidTarget {
-        publishLibraryVariants("release")
-        @OptIn(ExperimentalKotlinGradlePluginApi::class)
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_17)
+
+    android {
+        namespace = libs.versions.applicationId.get()
+        compileSdk {
+            version = release(libs.versions.compileSdk.get().toInt())
         }
     }
+
     // See: https://kotlinlang.org/docs/js-project-setup.html
     js(IR) {
         browser {
@@ -119,20 +116,20 @@ kotlin {
     }
 }
 
-android {
-    namespace = "io.github.aughtone.gravatar"
-    compileSdk = libs.versions.compileSdk.get().toInt()
-    defaultConfig {
-        minSdk = libs.versions.minSdk.get().toInt()
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-}
+//android {
+//    namespace = "io.github.aughtone.gravatar"
+//    compileSdk = libs.versions.compileSdk.get().toInt()
+//    defaultConfig {
+//        minSdk = libs.versions.minSdk.get().toInt()
+//    }
+//    compileOptions {
+//        sourceCompatibility = JavaVersion.VERSION_17
+//        targetCompatibility = JavaVersion.VERSION_17
+//    }
+//}
 
 mavenPublishing {
-    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+    publishToMavenCentral()
 
     if (!project.hasProperty("skip-signing")) {
         signAllPublications()
