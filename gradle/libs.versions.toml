@@ -1,21 +1,22 @@
 [versions]
-applicationId = "io.github.aughtone.types"
-versionName = "1.0.1"
+namespace = "io.github.aughtone"
+applicationId = "io.github.aughtone.gravatar"
+versionName = "1.0.2"
 versionNameSiffix = "-alpha3"
 minSdk = "24"
-compileSdk = "36"
+compileSdk = "37"
 
-agp = "8.9.2"
-kotlin = "2.1.20"
-kotlinx-serialization = "1.8.1"
-kotlinx-datetime = "0.6.2"
-vanniktech = "0.31.0"
+agp = "9.1.1"
+kotlin = "2.3.20"
+kotlinx-serialization = "1.11.0"
+kotlinx-datetime = "0.7.1"
+vanniktech = "0.36.0"
 
-kotlincrypto = "0.7.0"
-ktor = "3.1.2"
+kotlincrypto = "0.8.0"
+ktor = "3.4.3"
 coroutines = "1.10.2"
 
-aughtone-types = "1.0.0-alpha3"
+aughtone-types = "2.0.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -44,7 +45,7 @@ aughtone-types = { module = "io.github.aughtone:types", version.ref = "aughtone-
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
-androidLibrary = { id = "com.android.library", version.ref = "agp" }
+multiplatformLibrary = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }

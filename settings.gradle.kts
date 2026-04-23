@@ -26,7 +26,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "aughtone-gravatar"
+rootProject.name = "AOGravatar"
 
 include(":gravatar")
 //include(":composeApp")
