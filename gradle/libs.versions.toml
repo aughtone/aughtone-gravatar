@@ -1,6 +1,6 @@
 [versions]
 applicationId = "io.github.aughtone.types"
-versionName = "1.0.0"
+versionName = "1.0.1"
 versionNameSiffix = "-alpha3"
 minSdk = "24"
 compileSdk = "36"
