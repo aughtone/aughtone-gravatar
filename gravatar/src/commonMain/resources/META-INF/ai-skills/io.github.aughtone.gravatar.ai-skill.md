@@ -1,7 +1,7 @@
 ---
 skill-id: io.github.aughtone.gravatar
-name: "[AughtOne Gravatar](https://github.com/aughtone/aughtone-gravatar)"
-type: "AughtOne AI-Skill"
+name: "[Aughtone Gravatar](https://github.com/aughtone/aughtone-gravatar)"
+type: "Aughtone AI-Skill"
 scope: core
 compatibility: ">=1.0.0"
 author: "[Brill Pappin](https://github.com/bpappin)"

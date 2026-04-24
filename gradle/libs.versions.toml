@@ -1,6 +1,5 @@
 [versions]
-namespace = "io.github.aughtone"
-applicationId = "io.github.aughtone.gravatar"
+namespace = "io.github.aughtone.gravatar"
 versionName = "1.0.3"
 versionNameSiffix = "-alpha3"
 minSdk = "24"
@@ -16,7 +15,7 @@ kotlincrypto = "0.8.0"
 ktor = "3.4.3"
 coroutines = "1.10.2"
 
-aughtone-types = "2.0.0"
+aughtone-types = "2.0.3"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }

@@ -7,7 +7,7 @@ plugins {
     alias(libs.plugins.vanniktech.mavenPublish)
 }
 
-group = "io.github.aughtone"
+group = libs.versions.namespace.get().toString()
 version = libs.versions.versionName.get()
 
 kotlin {
@@ -15,7 +15,7 @@ kotlin {
     jvm()
 
     android {
-        namespace = libs.versions.applicationId.get()
+        namespace = libs.versions.namespace.get().toString()
         compileSdk {
             version = release(libs.versions.compileSdk.get().toInt())
         }
@@ -31,11 +31,11 @@ kotlin {
     }
     listOf(iosX64(), iosArm64(), iosSimulatorArm64()).forEach {
         it.binaries.framework {
-            baseName = "GravatarKit"
+            baseName = "AughtoneGravatarKit"
             isStatic = true
             binaryOption(
                 "bundleId",
-                libs.versions.applicationId.get().toString()
+                libs.versions.namespace.get().toString()
             ) //"app.occurrence"
             binaryOption(
                 "bundleShortVersionString",
@@ -138,7 +138,7 @@ mavenPublishing {
     coordinates(group.toString(), "gravatar", version.toString())
 
     pom {
-        name = "Aught One Types"
+        name = "Aughtone Gravatar"
         description = "A library of reusable types."
         inceptionYear = "2025"
         url = "https://github.com/aughtone/aughtone-gravatar"
