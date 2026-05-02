@@ -24,46 +24,87 @@ Feel free to fork it and make improvements, I'll keep up as best I can.
 
 # Features
 
-...describe features...
+- **Avatar URL Generation**: Support for SHA256 hashing, custom sizes, ratings, and default image fallbacks.
+- **Gravatar API v3 Support**: Full integration for uploading, retrieving, and managing avatars and user profiles.
+- **Compose Multiplatform (CMP) Components**: Ready-to-use UI components for displaying and editing Gravatar data.
+- **Coil 3 Integration**: Efficient image loading across all CMP platforms.
 
 # Installation
 
-![Maven Central Version](https://img.shields.io/maven-central/v/io.github.aughtone/gravatar?style=flat)
+### Kotlin Multiplatform / Android (Gradle)
+Add the dependency to your version catalog or build file:
 
-Add the dependency to tyour library file:
-
-```gradle
-[versions]
-aughtone-gravatar = "${version}"
-
+```kotlin
 [libraries]
-aughtone-gravatar = { module = "io.github.aughtone:gravatar", version.ref = "aughtone-gravatar" }
+gravatar = { module = "io.github.aughtone:gravatar", version.ref = "gravatar" }
+gravatar-ui = { module = "io.github.aughtone:gravatar-ui", version.ref = "gravatar" }
 ```
 
-Include the dependency in the module you want to use it with:
+### iOS / Swift (Swift Package Manager or CocoaPods)
+The library is distributed as a XCFramework. You can integrate `AughtoneGravatarKit` or `AOGravatarUI` directly into your Xcode project.
 
-```gradle
-implementation(libs.aughtone.gravatar)
+### JavaScript / Node.js (NPM)
+*Note: NPM publishing is currently being configured.*
+Once available, you can install via:
+```bash
+npm install @aughtone/gravatar
 ```
 
-Or if you are still old-school:
+# Usage by Platform
 
-```gradle
-implementation("io.github.aughtone:gravatar:${version}")
+### 📱 Android & Compose Multiplatform
+Use the `gravatar-ui` module for seamless integration with Compose:
+```kotlin
+GravatarImage(
+    email = "user@example.com",
+    size = 64.dp,
+    circle = true
+)
+```
+
+### 🍎 iOS (Swift)
+The library is exported as a framework. You can use it in Swift as follows:
+```swift
+import AughtoneGravatarKit
+
+let url = Gravatar.shared.getAvatarUrl(email: "user@example.com")
+```
+
+### 🌐 JavaScript / TypeScript
+For JS environments, the library provides TypeScript definitions:
+```typescript
+import { GravatarApi } from '@aughtone/gravatar';
+
+const api = new GravatarApi();
+const profile = await api.getProfile('user@example.com');
 ```
 
 # Quick Start
 
-You can get a simple Gravatar url like this:
-
+### Basic Avatar URL
 ```kotlin
-val avatarUrl: String = gravatarUrl(email = "johndoe@example.com", name = "John Doe")
+val url = gravatarUrlOf(email = "user@example.com", name = "John Doe")
 ```
 
-The name property will be used to generate an initials image if no Gravatar is found, so you get an
-output like the one with the initials, since that address is not registered with Gravatar:
+### Using the API (v3)
+```kotlin
+val api = GravatarApi(apiKey = "your_api_key")
+val profile = api.getProfile(emailOrHash = "user@example.com").getOrThrow()
+```
 
-![image](https://gravatar.com/avatar/55e79200c1635b37ad31a378c39feb12f120f116625093a19bc32fff15041149?s=128&r=g&d=initials&initials=JD) ![image](https://gravatar.com/avatar/21ba0fe27eb6ba49492e49beca5431f5f2f053640b41af189bf184edb8b26b62?s=128&r=g&d=initials&initials=BP)
+### UI Components (CMP)
+```kotlin
+// Display an avatar
+GravatarImage(email = "user@example.com", size = 64.dp)
+
+// Display a profile card
+GravatarProfileView(profile = userProfile)
+
+// Edit profile form
+GravatarEditProfileView(profile = userProfile, onSave = { request -> 
+    api.updateProfile(request = request)
+})
+```
 
 # Feedback
 
