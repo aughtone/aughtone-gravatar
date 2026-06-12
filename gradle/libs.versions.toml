@@ -5,20 +5,20 @@ versionNameSiffix = "-alpha3"
 minSdk = "24"
 compileSdk = "37"
 
-agp = "9.1.1"
-kotlin = "2.3.20"
+agp = "9.2.1"
+kotlin = "2.3.21"
 kotlinx-serialization = "1.11.0"
-kotlinx-datetime = "0.7.1"
+kotlinx-datetime = "0.8.0"
 vanniktech = "0.36.0"
 
-compose-multiplatform = "1.7.3"
-coil = "3.1.0"
+compose-multiplatform = "1.11.0"
+coil = "3.4.0"
 
 kotlincrypto = "0.8.0"
 ktor = "3.4.3"
-coroutines = "1.10.2"
+coroutines = "1.11.0"
 
-aughtone-types = "2.0.3"
+aughtone-types = "2.2.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }

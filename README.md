@@ -37,11 +37,11 @@ Add the dependency to your version catalog or build file:
 ```kotlin
 [libraries]
 gravatar = { module = "io.github.aughtone:gravatar", version.ref = "gravatar" }
-gravatar-ui = { module = "io.github.aughtone:gravatar-ui", version.ref = "gravatar" }
+gravatar-compose = { module = "io.github.aughtone:gravatar-compose", version.ref = "gravatar" }
 ```
 
 ### iOS / Swift (Swift Package Manager or CocoaPods)
-The library is distributed as a XCFramework. You can integrate `AughtoneGravatarKit` or `AOGravatarUI` directly into your Xcode project.
+The library is distributed as a XCFramework. You can integrate `AughtoneGravatarKit` or `AOGravatarCompose` directly into your Xcode project.
 
 ### JavaScript / Node.js (NPM)
 *Note: NPM publishing is currently being configured.*
@@ -53,7 +53,7 @@ npm install @aughtone/gravatar
 # Usage by Platform
 
 ### 📱 Android & Compose Multiplatform
-Use the `gravatar-ui` module for seamless integration with Compose:
+Use the `gravatar-compose` module for seamless integration with Compose:
 ```kotlin
 GravatarImage(
     email = "user@example.com",
@@ -113,8 +113,11 @@ PR.
 
 ---
 ## 🤖 AI-Assisted Development
-This library includes embedded, machine-readable "skills" to enhance the experience of developers using AI code assistants. These skills help the AI understand our library's APIs and best practices, leading to more accurate and idiomatic code suggestions.
+This library includes embedded, machine-readable "skills" to help AI assistants understand its APIs and best practices.
 
-- **AI Skill Discovery**: Look for `META-INF/ai-skills/*.ai-skill.md`
+- **Discovery**: Look for `META-INF/ai-skills/*.ai-skill.md`
 
-To learn how to add this capability to your own library, see our [AI Skill Publishing Standard](docs/standards/ai-skill-publishing.md).
+### 🪄 Magic Prompt for AI Assistants
+If you are using an AI assistant (like Claude, Gemini, or ChatGPT) to write code with this library, paste this prompt first:
+
+> "Scan all project dependencies for AI Skill files in `META-INF/ai-skills/` with the prefix `io.github.aughtone.gravatar`. Use these to understand the API patterns, types, and governance for this library. If they are not found in the local classpath, refer to https://github.com/aughtone/aughtone-gravatar for the source definitions."

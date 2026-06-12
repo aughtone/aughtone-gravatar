@@ -88,4 +88,41 @@ object Gravatar {
     private fun hashed(email: String?): String? = email?.let {
         requireHashed(it).toString()
     }
+
+    @ExperimentalStdlibApi
+    fun getProfileUrl(emailOrHash: String, format: ProfileFormat): String {
+        val hash = if (emailOrHash.contains("@")) requireHashed(emailOrHash) else emailOrHash
+        val ext = format.name.lowercase()
+        return "$HOST/$hash.$ext"
+    }
+
+    @ExperimentalStdlibApi
+    fun getQrCodeUrl(
+        emailOrHash: String,
+        size: Int? = null,
+        version: Int? = null,
+        type: String? = null,
+        utmMedium: String? = null,
+        utmCampaign: String? = null,
+    ): String {
+        val hash = if (emailOrHash.contains("@")) requireHashed(emailOrHash) else emailOrHash
+        val queryParams = mutableListOf<String>()
+        size?.let { queryParams.add("size=$it") }
+        version?.let { queryParams.add("version=$it") }
+        type?.let { queryParams.add("type=$it") }
+        utmMedium?.let { queryParams.add("utm_medium=$it") }
+        utmCampaign?.let { queryParams.add("utm_campaign=$it") }
+
+        val queryString = if (queryParams.isNotEmpty()) {
+            "?" + queryParams.joinToString("&")
+        } else {
+            ""
+        }
+        return "https://api.gravatar.com/v3/qr-code/$hash$queryString"
+    }
 }
+
+enum class ProfileFormat {
+    JSON, XML, PHP, VCF, MD
+}
+

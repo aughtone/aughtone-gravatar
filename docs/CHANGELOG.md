@@ -9,12 +9,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 - **Gravatar API v3 Support**: Implemented full support for avatar management (upload, list, activate, delete, update) and profile management (retrieve, update).
-- **Compose Multiplatform UI Module**: Created `gravatar-ui` with components for displaying avatars (`GravatarImage`), viewing profiles (`GravatarProfileView`), and editing profiles (`GravatarEditProfileView`).
+- **Compose Multiplatform UI Module**: Created `gravatar-compose` with components for displaying avatars (`GravatarImage`), viewing profiles (`GravatarProfileView`), and editing profiles (`GravatarEditProfileView`).
 - **Coil 3 Integration**: Efficient cross-platform image loading in the UI module.
 
 ### Changed
 - **Memory Optimization**: Increased Gradle heap size to 8GB to handle intensive iOS framework linking tasks.
-- **Dependency Updates**: Added `kotlinx-datetime` to `gravatar-ui` for Material 3 compatibility.
+- **Dependency Updates**: Added `kotlinx-datetime` to `gravatar-compose` for Material 3 compatibility.
 
 ## [1.0.4] - 2026-04-24
 

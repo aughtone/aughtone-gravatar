@@ -7,7 +7,7 @@ plugins {
     alias(libs.plugins.vanniktech.mavenPublish)
 }
 
-group = libs.versions.namespace.get().toString()
+group = libs.versions.namespace.get()
 version = libs.versions.versionName.get()
 
 kotlin {
@@ -15,7 +15,7 @@ kotlin {
     jvm()
 
     android {
-        namespace = libs.versions.namespace.get().toString()
+        namespace = libs.versions.namespace.get()
         compileSdk {
             version = release(libs.versions.compileSdk.get().toInt())
         }
@@ -27,21 +27,19 @@ kotlin {
             generateTypeScriptDefinitions()
         }
         useEsModules() // Enables ES2015 modules
-        // binaries.executable()
     }
-    listOf(iosX64(), iosArm64(), iosSimulatorArm64()).forEach {
+    listOf(iosArm64(), iosSimulatorArm64()).forEach {
         it.binaries.framework {
             baseName = "AughtoneGravatarKit"
             isStatic = true
             binaryOption(
                 "bundleId",
-                libs.versions.namespace.get().toString()
+                libs.versions.namespace.get()
             ) //"app.occurrence"
             binaryOption(
                 "bundleShortVersionString",
-                libs.versions.versionName.get().toString()
-            ) //"1.0.0"
-//            binaryOption("bundleVersion", libs.versions.versionCode.get().toString()) //"1"
+                libs.versions.versionName.get()
+            )
         }
     }
 
@@ -99,7 +97,7 @@ kotlin {
     compilerOptions {
         // XXX Activate when this is resolved:
         //  https://youtrack.jetbrains.com/issue/KT-57847/Move-common-for-all-the-backends-module-name-compiler-option-to-the-KotlinCommonCompilerOptions
-        // moduleName = "io.github.aughtone.types"
+        // moduleName = "io.github.aughtone.gavatar"
     }
     // XXX Remove when the above is resolved. This is a workaround.
     //  https://youtrack.jetbrains.com/issue/KT-66568/w-KLIB-resolver-The-same-uniquename...-found-in-more-than-one-library

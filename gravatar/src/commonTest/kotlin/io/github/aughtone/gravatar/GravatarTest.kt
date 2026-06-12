@@ -130,5 +130,42 @@ class GravatarTest {
         )
     }
 
+    @ExperimentalStdlibApi
+    @Test
+    fun testProfileUrlJSON() = runTest {
+        val actual = gravatar.getProfileUrl(testEmail, ProfileFormat.JSON)
+        assertEquals("https://gravatar.com/$testHash.json", actual)
+    }
 
+    @ExperimentalStdlibApi
+    @Test
+    fun testProfileUrlMD() = runTest {
+        val actual = gravatar.getProfileUrl(testEmail, ProfileFormat.MD)
+        assertEquals("https://gravatar.com/$testHash.md", actual)
+    }
+
+    @ExperimentalStdlibApi
+    @Test
+    fun testQrCodeUrlWithNoParams() = runTest {
+        val actual = gravatar.getQrCodeUrl(testEmail)
+        assertEquals("https://api.gravatar.com/v3/qr-code/$testHash", actual)
+    }
+
+    @ExperimentalStdlibApi
+    @Test
+    fun testQrCodeUrlWithAllParams() = runTest {
+        val actual = gravatar.getQrCodeUrl(
+            emailOrHash = testEmail,
+            size = 300,
+            version = 3,
+            type = "user",
+            utmMedium = "app",
+            utmCampaign = "onboarding"
+        )
+        assertEquals(
+            "https://api.gravatar.com/v3/qr-code/$testHash?size=300&version=3&type=user&utm_medium=app&utm_campaign=onboarding",
+            actual
+        )
+    }
 }
+

@@ -8,7 +8,7 @@ Aughtone Gravatar is a Kotlin Multiplatform library published to **Maven Central
 - **Group**: `io.github.aughtone`
 - **Artifacts**: 
     - `gravatar`: Core library (Hashing, API client, Data models).
-    - `gravatar-ui`: UI components (Compose Multiplatform).
+    - `gravatar-compose`: UI components (Compose Multiplatform).
 - **Version**: Managed via `libs.versions.versionName`
 
 ### Infrastructure
