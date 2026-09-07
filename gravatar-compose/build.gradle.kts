@@ -8,7 +8,7 @@ plugins {
     alias(libs.plugins.vanniktech.mavenPublish)
 }
 
-group = libs.versions.namespace.get().toString()
+group = libs.versions.namespace.get()
 version = libs.versions.versionName.get()
 
 kotlin {
@@ -22,7 +22,7 @@ kotlin {
         }
     }
 
-    listOf(iosX64(), iosArm64(), iosSimulatorArm64()).forEach {
+    listOf(iosArm64(), iosSimulatorArm64()).forEach {
         it.binaries.framework {
             baseName = "AOGravatarCompose"
             isStatic = true

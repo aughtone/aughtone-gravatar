@@ -11,10 +11,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - **Gravatar API v3 Support**: Implemented full support for avatar management (upload, list, activate, delete, update) and profile management (retrieve, update).
 - **Compose Multiplatform UI Module**: Created `gravatar-compose` with components for displaying avatars (`GravatarImage`), viewing profiles (`GravatarProfileView`), and editing profiles (`GravatarEditProfileView`).
 - **Coil 3 Integration**: Efficient cross-platform image loading in the UI module.
+- **API Response Validation**: Explicit HTTP status checks across all `GravatarApi` endpoints, parsing and propagating structured server error messages on failures instead of throwing deserialization errors.
+- **Clipboard Integration**: Action buttons to easily copy error messages to the clipboard inside the sample app and the default `GravatarProfile` component error state.
 
 ### Changed
 - **Memory Optimization**: Increased Gradle heap size to 8GB to handle intensive iOS framework linking tasks.
 - **Dependency Updates**: Added `kotlinx-datetime` to `gravatar-compose` for Material 3 compatibility.
+
+### Removed
+- **AI Skill Apparatus**: Removed the embedded `*.ai-skill.md` resources from both published artifacts, the `.agents/skills/` capability index, and the `docs/standards/` skill documents. The library no longer ships or consumes machine-readable agent skills.
 
 ## [1.0.4] - 2026-04-24
 

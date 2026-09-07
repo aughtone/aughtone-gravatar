@@ -29,4 +29,5 @@ dependencyResolutionManagement {
 rootProject.name = "AOGravatar"
 
 include(":gravatar")
-//include(":gravatar-compose")
+include(":gravatar-compose")
+include(":sample")

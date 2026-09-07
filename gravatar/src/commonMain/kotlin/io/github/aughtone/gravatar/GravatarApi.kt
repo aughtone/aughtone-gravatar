@@ -7,14 +7,22 @@ import io.ktor.client.plugins.resources.Resources
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.formData
 import io.ktor.client.request.forms.submitFormWithBinaryData
+import io.ktor.client.statement.HttpResponse
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
 /** Gravatar API base URL - V3 */
 internal const val GRAVATAR_API_BASE_URL_V3 = "https://api.gravatar.com/v3/"
+
+@Serializable
+internal data class ApiError(
+    val error: String,
+    val code: String? = null
+)
 
 @OptIn(ExperimentalStdlibApi::class)
 class GravatarApi(
@@ -38,6 +46,14 @@ class GravatarApi(
         }
     }
 
+    private suspend fun HttpResponse.ensureSuccess() {
+        if (!status.isSuccess()) {
+            val errorBody = runCatching { body<ApiError>() }.getOrNull()
+            val message = errorBody?.error ?: "HTTP error $status"
+            throw RuntimeException(message)
+        }
+    }
+
     suspend fun uploadAvatar(
         oauthToken: String? = null,
         imageData: ByteArray,
@@ -46,7 +62,7 @@ class GravatarApi(
         rating: Avatar.Rating? = null,
         altText: String? = null,
     ): Result<Avatar> = runCatching {
-        client.submitFormWithBinaryData(
+        val response = client.submitFormWithBinaryData(
             url = "${GRAVATAR_API_BASE_URL_V3}me/avatars",
             formData = formData {
                 append("file", imageData, Headers.build {
@@ -58,13 +74,17 @@ class GravatarApi(
             }
         ) {
             auth(oauthToken)
-        }.body()
+        }
+        response.ensureSuccess()
+        response.body()
     }
 
     suspend fun retrieveAvatars(oauthToken: String? = null): Result<List<Avatar>> = runCatching {
-        client.get("${GRAVATAR_API_BASE_URL_V3}me/avatars") {
+        val response = client.get("${GRAVATAR_API_BASE_URL_V3}me/avatars") {
             auth(oauthToken)
-        }.body()
+        }
+        response.ensureSuccess()
+        response.body()
     }
 
     suspend fun activateAvatar(
@@ -79,9 +99,7 @@ class GravatarApi(
                 contentType(ContentType.Application.Json)
                 setBody(SetEmailAvatarRequest(hash))
             }
-            if (!response.status.isSuccess()) {
-                throw RuntimeException("Failed to activate avatar for $email: ${response.status}")
-            }
+            response.ensureSuccess()
         }
     }
 
@@ -89,9 +107,7 @@ class GravatarApi(
         val response = client.delete("${GRAVATAR_API_BASE_URL_V3}me/avatars/$avatarId") {
             auth(oauthToken)
         }
-        if (!response.status.isSuccess()) {
-            throw RuntimeException("Failed to delete avatar: ${response.status}")
-        }
+        response.ensureSuccess()
     }
 
     suspend fun updateAvatar(
@@ -100,11 +116,13 @@ class GravatarApi(
         rating: Avatar.Rating? = null,
         altText: String? = null,
     ): Result<Avatar> = runCatching {
-        client.patch("${GRAVATAR_API_BASE_URL_V3}me/avatars/$avatarId") {
+        val response = client.patch("${GRAVATAR_API_BASE_URL_V3}me/avatars/$avatarId") {
             auth(oauthToken)
             contentType(ContentType.Application.Json)
             setBody(UpdateAvatarRequest(rating, altText))
-        }.body()
+        }
+        response.ensureSuccess()
+        response.body()
     }
 
     suspend fun getProfile(
@@ -112,20 +130,24 @@ class GravatarApi(
         emailOrHash: String,
     ): Result<Profile> = runCatching {
         val identifier = if (emailOrHash.contains("@")) Gravatar.requireHashed(emailOrHash) else emailOrHash
-        client.get("${GRAVATAR_API_BASE_URL_V3}profiles/$identifier") {
+        val response = client.get("${GRAVATAR_API_BASE_URL_V3}profiles/$identifier") {
             auth(oauthToken)
-        }.body()
+        }
+        response.ensureSuccess()
+        response.body()
     }
 
     suspend fun updateProfile(
         oauthToken: String? = null,
         request: UpdateProfileRequest,
     ): Result<Profile> = runCatching {
-        client.patch("${GRAVATAR_API_BASE_URL_V3}me/profile") {
+        val response = client.patch("${GRAVATAR_API_BASE_URL_V3}me/profile") {
             auth(oauthToken)
             contentType(ContentType.Application.Json)
             setBody(request)
-        }.body()
+        }
+        response.ensureSuccess()
+        response.body()
     }
 
     suspend fun getQrCode(
@@ -138,9 +160,11 @@ class GravatarApi(
         utmCampaign: String? = null,
     ): Result<ByteArray> = runCatching {
         val url = Gravatar.getQrCodeUrl(emailOrHash, size, version, type, utmMedium, utmCampaign)
-        client.get(url) {
+        val response = client.get(url) {
             auth(oauthToken)
-        }.body()
+        }
+        response.ensureSuccess()
+        response.body()
     }
 
     // Deprecated or old methods kept for compatibility if needed, but updated to use v3
