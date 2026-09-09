@@ -110,7 +110,7 @@ class GravatarTest {
             )
                 .getOrThrow()
         assertEquals(
-            "https://gravatar.com/avatar/$testHash?s=1024&r=g&d=initials&name=John+Pappin",
+            "https://gravatar.com/avatar/$testHash?s=1024&r=g&d=initials&name=John%20Pappin",
             actual
         )
     }
@@ -167,5 +167,17 @@ class GravatarTest {
             actual
         )
     }
-}
 
+    /**
+     * An identifier that is already hashed must not be hashed a second time.
+     * Regression: GravatarProfileView passes Profile.hash, which previously
+     * produced a URL for an account that does not exist.
+     */
+    @ExperimentalStdlibApi
+    @Test
+    fun testAvatarUrlAcceptsAnAlreadyHashedIdentifier() = runTest {
+        val fromEmail = gravatar.getAvatarUrl(email = testEmail).getOrThrow()
+        val fromHash = gravatar.getAvatarUrl(email = testHash).getOrThrow()
+        assertEquals(fromEmail, fromHash)
+    }
+}

@@ -49,8 +49,14 @@ kotlin {
     sourceSets {
         androidMain {
             dependencies {
-                implementation(libs.ktor.client.okhttp)
+                implementation(libs.ktor.client.cio)
                 implementation(libs.kotlinx.coroutines.android)
+            }
+        }
+
+        jvmMain {
+            dependencies {
+                implementation(libs.ktor.client.cio)
             }
         }
 
@@ -77,7 +83,6 @@ kotlin {
                 implementation(libs.kotlincrypto.digest)
                 implementation(libs.kotlincrypto.sha2)
                 implementation(libs.ktor.client.core)
-                implementation(libs.ktor.client.cio)
                 implementation(libs.ktor.client.resources)
                 implementation(libs.ktor.client.content.negotiation)
                 implementation(libs.ktor.serialization.kotlinx.json)

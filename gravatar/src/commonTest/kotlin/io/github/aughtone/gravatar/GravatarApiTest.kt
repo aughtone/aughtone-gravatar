@@ -13,6 +13,8 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertIs
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
@@ -259,5 +261,39 @@ class GravatarApiTest {
         // Test activateAvatar
         val activateResult = api.activateAvatar(imageId = "avatar123", emails = listOf("test@example.com"))
         assertTrue(activateResult.isSuccess)
+    }
+
+    /**
+     * A non-success response must surface as a typed GravatarApiException carrying
+     * the HTTP status, so callers can branch on the status rather than string-match
+     * server-supplied error text.
+     */
+    @Test
+    fun testFailedLookupThrowsTypedExceptionCarryingStatus() = runTest {
+        val mockEngine = MockEngine { _ ->
+            respond(
+                content = """{"error":"Profile not found","code":"not_found"}""",
+                status = HttpStatusCode.NotFound,
+                headers = headersOf(HttpHeaders.ContentType, "application/json")
+            )
+        }
+        val mockClient = HttpClient(mockEngine) {
+            install(ContentNegotiation) {
+                json(Json { ignoreUnknownKeys = true; coerceInputValues = true })
+            }
+        }
+        val api = GravatarApi(apiKey = "test-key", client = mockClient)
+
+        val result = api.getProfile(emailOrHash = testHash)
+
+        assertTrue(result.isFailure)
+        val error = result.exceptionOrNull()
+        assertIs<GravatarApiException>(error)
+        assertEquals(404, error.status)
+        assertTrue(error.isNotFound)
+        assertFalse(error.isUnauthorized)
+        assertFalse(error.isServerError)
+        // message comes from the structured error body, not a generated fallback
+        assertEquals("Profile not found", error.message)
     }
 }

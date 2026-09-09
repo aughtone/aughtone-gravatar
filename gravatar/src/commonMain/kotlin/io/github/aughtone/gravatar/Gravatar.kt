@@ -69,7 +69,10 @@ object Gravatar {
         runCatching {
             require(sizeInPixels in 1..2048) { "The sizeInPixels parameter must be between 1 and 2048." }
 
-            val emailHash = requireHashed(email)
+            // Accept either a raw email or an already-hashed identifier, matching
+            // getProfileUrl and getQrCodeUrl. Hashing an existing hash yields a URL
+            // for an account that does not exist.
+            val emailHash = if (email.contains("@")) requireHashed(email) else email
 
             return Result.success("$HOST/avatar/$emailHash?s=$sizeInPixels&r=${rating}${defaultImage?.params?.let { "&d=$it" } ?: ""}${
                 if (forceDefault) {

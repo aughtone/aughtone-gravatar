@@ -50,7 +50,7 @@ class GravatarApi(
         if (!status.isSuccess()) {
             val errorBody = runCatching { body<ApiError>() }.getOrNull()
             val message = errorBody?.error ?: "HTTP error $status"
-            throw RuntimeException(message)
+            throw GravatarApiException(status = status.value, message = message)
         }
     }
 

@@ -5,7 +5,9 @@ plugins {
     alias(libs.plugins.multiplatformLibrary)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
-    alias(libs.plugins.vanniktech.mavenPublish)
+    // Publishing disabled: the Compose components are not reviewed for a public
+    // API yet. Re-enable this and the mavenPublishing block below to release.
+//    alias(libs.plugins.vanniktech.mavenPublish)
 }
 
 group = libs.versions.namespace.get()
@@ -57,38 +59,39 @@ kotlin {
     }
 }
 
-mavenPublishing {
-    publishToMavenCentral(automaticRelease = true)
-
-    if (!project.hasProperty("skip-signing")) {
-        signAllPublications()
-    }
-
-    coordinates(group.toString(), "gravatar-compose", version.toString())
-
-    pom {
-        name = "AOGravatar UI"
-        description = "Compose Multiplatform components for Gravatar."
-        inceptionYear = "2025"
-        url = "https://github.com/aughtone/aughtone-gravatar"
-        licenses {
-            license {
-                name = "The Apache License, Version 2.0"
-                url = "https://www.apache.org/licenses/LICENSE-2.0"
-                distribution = "https://www.apache.org/licenses/LICENSE-2.0.txt"
-            }
-        }
-        developers {
-            developer {
-                id = "bpappin"
-                name = "Brill pappin"
-                url = "https://github.com/bpappin"
-            }
-        }
-        scm {
-            url = "https://github.com/aughtone/aughtone-gravatar"
-            connection = "https://github.com/aughtone/aughtone-gravatar.git"
-            developerConnection = "git@github.com:aughtone/aughtone-gravatar.git"
-        }
-    }
-}
+// Publishing disabled - see the plugins block above.
+//mavenPublishing {
+//    publishToMavenCentral(automaticRelease = true)
+//
+//    if (!project.hasProperty("skip-signing")) {
+//        signAllPublications()
+//    }
+//
+//    coordinates(group.toString(), "gravatar-compose", version.toString())
+//
+//    pom {
+//        name = "AOGravatar UI"
+//        description = "Compose Multiplatform components for Gravatar."
+//        inceptionYear = "2025"
+//        url = "https://github.com/aughtone/aughtone-gravatar"
+//        licenses {
+//            license {
+//                name = "The Apache License, Version 2.0"
+//                url = "https://www.apache.org/licenses/LICENSE-2.0"
+//                distribution = "https://www.apache.org/licenses/LICENSE-2.0.txt"
+//            }
+//        }
+//        developers {
+//            developer {
+//                id = "bpappin"
+//                name = "Brill pappin"
+//                url = "https://github.com/bpappin"
+//            }
+//        }
+//        scm {
+//            url = "https://github.com/aughtone/aughtone-gravatar"
+//            connection = "https://github.com/aughtone/aughtone-gravatar.git"
+//            developerConnection = "git@github.com:aughtone/aughtone-gravatar.git"
+//        }
+//    }
+//}

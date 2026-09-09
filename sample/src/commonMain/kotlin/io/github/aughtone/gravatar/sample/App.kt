@@ -7,6 +7,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import io.github.aughtone.gravatar.GravatarApi
 import io.github.aughtone.gravatar.Profile
@@ -16,7 +18,8 @@ import io.github.aughtone.gravatar.compose.GravatarEditProfile
 @Composable
 fun App(defaultApiKey: String? = null) {
     var apiKey by remember { mutableStateOf(defaultApiKey ?: "") }
-    var emailOrHash by remember { mutableStateOf("example@example.com") }
+    var apiKeyVisible by remember { mutableStateOf(false) }
+    var emailOrHash by remember { mutableStateOf("") }
     var triggerSearch by remember { mutableStateOf(0) }
     var isEditing by remember { mutableStateOf(false) }
     var loadedProfile by remember { mutableStateOf<Profile?>(null) }
@@ -47,6 +50,19 @@ fun App(defaultApiKey: String? = null) {
                     value = apiKey,
                     onValueChange = { apiKey = it },
                     label = { Text("API Key (Bearer Token)") },
+                    singleLine = true,
+                    // A bearer token is a live credential; keep it off screen unless
+                    // the user deliberately reveals it.
+                    visualTransformation = if (apiKeyVisible) {
+                        VisualTransformation.None
+                    } else {
+                        PasswordVisualTransformation()
+                    },
+                    trailingIcon = {
+                        TextButton(onClick = { apiKeyVisible = !apiKeyVisible }) {
+                            Text(if (apiKeyVisible) "Hide" else "Show")
+                        }
+                    },
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -59,10 +75,13 @@ fun App(defaultApiKey: String? = null) {
                         value = emailOrHash,
                         onValueChange = { emailOrHash = it },
                         label = { Text("Email or MD5/SHA256 Hash") },
+                        placeholder = { Text("you@example.com") },
+                        singleLine = true,
                         modifier = Modifier.weight(1f)
                     )
 
                     Button(
+                        enabled = emailOrHash.isNotBlank(),
                         onClick = {
                             isEditing = false
                             loadedProfile = null
