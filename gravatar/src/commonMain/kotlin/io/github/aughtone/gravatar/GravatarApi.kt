@@ -4,17 +4,25 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.resources.Resources
-import io.ktor.client.plugins.resources.get
-import io.ktor.http.ContentType
-import io.ktor.http.HttpHeaders
-import io.ktor.http.appendPathSegments
-import io.ktor.http.headers
+import io.ktor.client.request.*
+import io.ktor.client.request.forms.formData
+import io.ktor.client.request.forms.submitFormWithBinaryData
+import io.ktor.client.statement.HttpResponse
+import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 
 /** Gravatar API base URL - V3 */
 internal const val GRAVATAR_API_BASE_URL_V3 = "https://api.gravatar.com/v3/"
+
+@Serializable
+internal data class ApiError(
+    val error: String,
+    val code: String? = null
+)
 
 @OptIn(ExperimentalStdlibApi::class)
 class GravatarApi(
@@ -22,113 +30,148 @@ class GravatarApi(
     var appName: String? = null,
     private val client: HttpClient = HttpClient() {
         install(ContentNegotiation) {
-            json()
+            json(Json {
+                ignoreUnknownKeys = true
+                coerceInputValues = true
+            })
         }
         install(Resources)
-
     },
 ) {
-    suspend fun upload(
-        oauthToken: String,
-        email: String,
-        selectAvatar: Boolean? = null,
-        imageData: ByteArray,
-    ): Result<Avatar> = runCatching {
-        withContext(Dispatchers.Default) {
-            val emailHash = Gravatar.requireHashed(email)
-            throw RuntimeException("Not implemented")
+
+    private fun HttpRequestBuilder.auth(token: String?) {
+        val finalToken = token ?: apiKey
+        if (finalToken != null) {
+            header(HttpHeaders.Authorization, "Bearer $finalToken")
         }
     }
 
-
-    suspend fun retrieve(oauthToken: String, email: String): Result<List<Avatar>> =
-        runCatching {
-            withContext(Dispatchers.Default) {
-                val emailHash = Gravatar.requireHashed(email)
-            }
-            throw RuntimeException("Not implemented")
-//            return emptyList()
+    private suspend fun HttpResponse.ensureSuccess() {
+        if (!status.isSuccess()) {
+            val errorBody = runCatching { body<ApiError>() }.getOrNull()
+            val message = errorBody?.error ?: "HTTP error $status"
+            throw GravatarApiException(status = status.value, message = message)
         }
+    }
 
-    suspend fun setAvatar(
-        oauthToken: String,
-        email: String,
-        avatarId: String,
-    ): Result<Unit> =
-        runCatching {
-            withContext(Dispatchers.Default) {
-                val emailHash = Gravatar.requireHashed(email)
-                throw RuntimeException("Not implemented")
+    suspend fun uploadAvatar(
+        oauthToken: String? = null,
+        imageData: ByteArray,
+        filename: String = "avatar.jpg",
+        contentType: ContentType = ContentType.Image.JPEG,
+        rating: Avatar.Rating? = null,
+        altText: String? = null,
+    ): Result<Avatar> = runCatching {
+        val response = client.submitFormWithBinaryData(
+            url = "${GRAVATAR_API_BASE_URL_V3}me/avatars",
+            formData = formData {
+                append("file", imageData, Headers.build {
+                    append(HttpHeaders.ContentType, contentType.toString())
+                    append(HttpHeaders.ContentDisposition, "filename=\"$filename\"")
+                })
+                rating?.let { append("rating", it.name) }
+                altText?.let { append("alt_text", it) }
             }
+        ) {
+            auth(oauthToken)
         }
+        response.ensureSuccess()
+        response.body()
+    }
 
-    suspend fun deleteAvatar(oauthToken: String, avatarId: String): Result<Unit> =
-        runCatching {
-            withContext(Dispatchers.Default) {
-                throw RuntimeException("Not implemented")
-            }
+    suspend fun retrieveAvatars(oauthToken: String? = null): Result<List<Avatar>> = runCatching {
+        val response = client.get("${GRAVATAR_API_BASE_URL_V3}me/avatars") {
+            auth(oauthToken)
         }
+        response.ensureSuccess()
+        response.body()
+    }
+
+    suspend fun activateAvatar(
+        oauthToken: String? = null,
+        imageId: String,
+        emails: List<String>,
+    ): Result<Unit> = runCatching {
+        for (email in emails) {
+            val hash = if (email.contains("@")) Gravatar.requireHashed(email) else email
+            val response = client.post("${GRAVATAR_API_BASE_URL_V3}me/avatars/$imageId/email") {
+                auth(oauthToken)
+                contentType(ContentType.Application.Json)
+                setBody(SetEmailAvatarRequest(hash))
+            }
+            response.ensureSuccess()
+        }
+    }
+
+    suspend fun deleteAvatar(oauthToken: String? = null, avatarId: String): Result<Unit> = runCatching {
+        val response = client.delete("${GRAVATAR_API_BASE_URL_V3}me/avatars/$avatarId") {
+            auth(oauthToken)
+        }
+        response.ensureSuccess()
+    }
 
     suspend fun updateAvatar(
-        oauthToken: String,
+        oauthToken: String? = null,
         avatarId: String,
-        avatarRating: Avatar.Rating? = null,
+        rating: Avatar.Rating? = null,
         altText: String? = null,
-    ): Result<Nothing> = runCatching {
-        withContext(Dispatchers.Default) {
-            throw RuntimeException("Not implemented")
+    ): Result<Avatar> = runCatching {
+        val response = client.patch("${GRAVATAR_API_BASE_URL_V3}me/avatars/$avatarId") {
+            auth(oauthToken)
+            contentType(ContentType.Application.Json)
+            setBody(UpdateAvatarRequest(rating, altText))
         }
+        response.ensureSuccess()
+        response.body()
     }
 
-    @OptIn(ExperimentalStdlibApi::class)
-    suspend fun getAvatarUrl(
-        email: String,
-        sizeInPixels: Int = 1024,
-        defaultImage: String? = null,
-    ): Result<String> =
-        runCatching {
-            require(sizeInPixels in 1..2048) { "The sizeInPixels parameter must be between 1 and 2048." }
-
-            val emailHash = Gravatar.requireHashed(email)
-            //        ?s=200
-            val path = "avatar"
-
-            val response = client.get(GRAVATAR_API_BASE_URL_V3) {
-                headers {
-                    append(HttpHeaders.Accept, ContentType.Application.Json.contentType)
-//                append(HttpHeaders.Authorization, "abc123")
-//                append(HttpHeaders.UserAgent, "ktor client")
-                }
-
-                url {
-                    emailHash?.let {
-                        appendPathSegments(segments = listOf(path, it))
-                    }
-                    parameters.append(
-                        "s",
-                        sizeInPixels.toString()
-                    )
-                    defaultImage?.let {
-                        parameters.append(
-                            "d",
-                            it
-                        )
-                    }
-                }
-            }
-
-            if (response.status.value in 200..299) {
-                println("Successful response!")
-                return Result.success("")
-            } else if (response.status.value == 401) {
-                return Result.failure(Exception("Unauthorized"))
-            } else if (response.status.value == 403) {
-                return Result.failure(Exception("Insufficient Scope"))
-            } else {
-                return Result.failure(Exception("Something went wrong"))
-            }
-
-            return Result.success(response.body())
-
+    suspend fun getProfile(
+        oauthToken: String? = null,
+        emailOrHash: String,
+    ): Result<Profile> = runCatching {
+        val identifier = if (emailOrHash.contains("@")) Gravatar.requireHashed(emailOrHash) else emailOrHash
+        val response = client.get("${GRAVATAR_API_BASE_URL_V3}profiles/$identifier") {
+            auth(oauthToken)
         }
+        response.ensureSuccess()
+        response.body()
+    }
+
+    suspend fun updateProfile(
+        oauthToken: String? = null,
+        request: UpdateProfileRequest,
+    ): Result<Profile> = runCatching {
+        val response = client.patch("${GRAVATAR_API_BASE_URL_V3}me/profile") {
+            auth(oauthToken)
+            contentType(ContentType.Application.Json)
+            setBody(request)
+        }
+        response.ensureSuccess()
+        response.body()
+    }
+
+    suspend fun getQrCode(
+        oauthToken: String? = null,
+        emailOrHash: String,
+        size: Int? = null,
+        version: Int? = null,
+        type: String? = null,
+        utmMedium: String? = null,
+        utmCampaign: String? = null,
+    ): Result<ByteArray> = runCatching {
+        val url = Gravatar.getQrCodeUrl(emailOrHash, size, version, type, utmMedium, utmCampaign)
+        val response = client.get(url) {
+            auth(oauthToken)
+        }
+        response.ensureSuccess()
+        response.body()
+    }
+
+    // Deprecated or old methods kept for compatibility if needed, but updated to use v3
+    @Deprecated("Use retrieveAvatars", ReplaceWith("retrieveAvatars(oauthToken)"))
+    suspend fun retrieve(oauthToken: String, email: String): Result<List<Avatar>> = retrieveAvatars(oauthToken)
+
+    @Deprecated("Use activateAvatar", ReplaceWith("activateAvatar(oauthToken, avatarId, listOf(email))"))
+    suspend fun setAvatar(oauthToken: String, email: String, avatarId: String): Result<Unit> =
+        activateAvatar(oauthToken, avatarId, listOf(email))
 }

@@ -7,7 +7,7 @@ plugins {
     alias(libs.plugins.vanniktech.mavenPublish)
 }
 
-group = "io.github.aughtone"
+group = libs.versions.namespace.get()
 version = libs.versions.versionName.get()
 
 kotlin {
@@ -15,7 +15,7 @@ kotlin {
     jvm()
 
     android {
-        namespace = libs.versions.applicationId.get()
+        namespace = libs.versions.namespace.get()
         compileSdk {
             version = release(libs.versions.compileSdk.get().toInt())
         }
@@ -27,21 +27,19 @@ kotlin {
             generateTypeScriptDefinitions()
         }
         useEsModules() // Enables ES2015 modules
-        // binaries.executable()
     }
-    listOf(iosX64(), iosArm64(), iosSimulatorArm64()).forEach {
+    listOf(iosArm64(), iosSimulatorArm64()).forEach {
         it.binaries.framework {
-            baseName = "GravatarKit"
+            baseName = "AughtoneGravatarKit"
             isStatic = true
             binaryOption(
                 "bundleId",
-                libs.versions.applicationId.get().toString()
+                libs.versions.namespace.get()
             ) //"app.occurrence"
             binaryOption(
                 "bundleShortVersionString",
-                libs.versions.versionName.get().toString()
-            ) //"1.0.0"
-//            binaryOption("bundleVersion", libs.versions.versionCode.get().toString()) //"1"
+                libs.versions.versionName.get()
+            )
         }
     }
 
@@ -51,8 +49,14 @@ kotlin {
     sourceSets {
         androidMain {
             dependencies {
-                implementation(libs.ktor.client.okhttp)
+                implementation(libs.ktor.client.cio)
                 implementation(libs.kotlinx.coroutines.android)
+            }
+        }
+
+        jvmMain {
+            dependencies {
+                implementation(libs.ktor.client.cio)
             }
         }
 
@@ -79,7 +83,6 @@ kotlin {
                 implementation(libs.kotlincrypto.digest)
                 implementation(libs.kotlincrypto.sha2)
                 implementation(libs.ktor.client.core)
-                implementation(libs.ktor.client.cio)
                 implementation(libs.ktor.client.resources)
                 implementation(libs.ktor.client.content.negotiation)
                 implementation(libs.ktor.serialization.kotlinx.json)
@@ -99,7 +102,7 @@ kotlin {
     compilerOptions {
         // XXX Activate when this is resolved:
         //  https://youtrack.jetbrains.com/issue/KT-57847/Move-common-for-all-the-backends-module-name-compiler-option-to-the-KotlinCommonCompilerOptions
-        // moduleName = "io.github.aughtone.types"
+        // moduleName = "io.github.aughtone.gavatar"
     }
     // XXX Remove when the above is resolved. This is a workaround.
     //  https://youtrack.jetbrains.com/issue/KT-66568/w-KLIB-resolver-The-same-uniquename...-found-in-more-than-one-library
@@ -129,7 +132,7 @@ kotlin {
 //}
 
 mavenPublishing {
-    publishToMavenCentral()
+    publishToMavenCentral(automaticRelease = true)
 
     if (!project.hasProperty("skip-signing")) {
         signAllPublications()
@@ -138,7 +141,7 @@ mavenPublishing {
     coordinates(group.toString(), "gravatar", version.toString())
 
     pom {
-        name = "Aught One Types"
+        name = "Aughtone Gravatar"
         description = "A library of reusable types."
         inceptionYear = "2025"
         url = "https://github.com/aughtone/aughtone-gravatar"

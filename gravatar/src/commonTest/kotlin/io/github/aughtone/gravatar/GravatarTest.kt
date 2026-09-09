@@ -8,8 +8,8 @@ import kotlin.test.assertEquals
 class GravatarTest {
 //    private val mainThreadSurrogate = newSingleThreadContext("UI thread")
 
-    private val testHash = "21ba0fe27eb6ba49492e49beca5431f5f2f053640b41af189bf184edb8b26b62"
-    private val testEmail = "brill@pappin.ca"
+    private val testHash = "973dfe463ec85785f5f95af5ba3906eedb2d931c24e69824a89ea65dba4e813b"
+    private val testEmail = "test@example.com"
     private val gravatar = Gravatar
 
     //    @Before
@@ -23,16 +23,6 @@ class GravatarTest {
 //        mainThreadSurrogate.close()
 //    }
 
-//    @ExperimentalStdlibApi
-//    @Test
-//    fun testUrl() = runTest {
-//        val actual = gravatar.getAvatarUrl(
-//            email = "johnpappin@gmail.com",
-//            sizeInPixels = 128,
-//            defaultImage = DefaultImage.Initials(initials = "JP")
-//        ).getOrThrow()
-//        assertEquals("", actual)
-//    }
 
     @ExperimentalStdlibApi
     @Test
@@ -106,11 +96,11 @@ class GravatarTest {
         val actual =
             gravatar.getAvatarUrl(
                 email = testEmail,
-                defaultImage = Gravatar.DefaultImage.Initials(name = "John Pappin")
+                defaultImage = Gravatar.DefaultImage.Initials(name = "Jane Doe")
             )
                 .getOrThrow()
         assertEquals(
-            "https://gravatar.com/avatar/$testHash?s=1024&r=g&d=initials&name=John+Pappin",
+            "https://gravatar.com/avatar/$testHash?s=1024&r=g&d=initials&name=Jane%20Doe",
             actual
         )
     }
@@ -130,5 +120,54 @@ class GravatarTest {
         )
     }
 
+    @ExperimentalStdlibApi
+    @Test
+    fun testProfileUrlJSON() = runTest {
+        val actual = gravatar.getProfileUrl(testEmail, ProfileFormat.JSON)
+        assertEquals("https://gravatar.com/$testHash.json", actual)
+    }
 
+    @ExperimentalStdlibApi
+    @Test
+    fun testProfileUrlMD() = runTest {
+        val actual = gravatar.getProfileUrl(testEmail, ProfileFormat.MD)
+        assertEquals("https://gravatar.com/$testHash.md", actual)
+    }
+
+    @ExperimentalStdlibApi
+    @Test
+    fun testQrCodeUrlWithNoParams() = runTest {
+        val actual = gravatar.getQrCodeUrl(testEmail)
+        assertEquals("https://api.gravatar.com/v3/qr-code/$testHash", actual)
+    }
+
+    @ExperimentalStdlibApi
+    @Test
+    fun testQrCodeUrlWithAllParams() = runTest {
+        val actual = gravatar.getQrCodeUrl(
+            emailOrHash = testEmail,
+            size = 300,
+            version = 3,
+            type = "user",
+            utmMedium = "app",
+            utmCampaign = "onboarding"
+        )
+        assertEquals(
+            "https://api.gravatar.com/v3/qr-code/$testHash?size=300&version=3&type=user&utm_medium=app&utm_campaign=onboarding",
+            actual
+        )
+    }
+
+    /**
+     * An identifier that is already hashed must not be hashed a second time.
+     * Regression: GravatarProfileView passes Profile.hash, which previously
+     * produced a URL for an account that does not exist.
+     */
+    @ExperimentalStdlibApi
+    @Test
+    fun testAvatarUrlAcceptsAnAlreadyHashedIdentifier() = runTest {
+        val fromEmail = gravatar.getAvatarUrl(email = testEmail).getOrThrow()
+        val fromHash = gravatar.getAvatarUrl(email = testHash).getOrThrow()
+        assertEquals(fromEmail, fromHash)
+    }
 }

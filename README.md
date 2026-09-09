@@ -1,12 +1,12 @@
 [![GitHub license](https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg?style=flat)](http://www.apache.org/licenses/LICENSE-2.0)
 ![Maven Central Version](https://img.shields.io/maven-central/v/io.github.aughtone/gravatar?style=flat)
-[![Kotlin](https://img.shields.io/badge/Kotlin-2.1.10-blue.svg?logo=kotlin&style=flat)](http://kotlinlang.org)
+[![Kotlin](https://img.shields.io/badge/Kotlin-2.4.0-blue.svg?logo=kotlin&style=flat)](http://kotlinlang.org)
 [![Kotlin Multiplatform](https://img.shields.io/badge/Kotlin-Multiplatform-brightgreen?logo=kotlin)](https://github.com/JetBrains/compose-multiplatform)
 
 ![badge-android](http://img.shields.io/badge/platform-android-6EDB8D.svg?style=flat)
 ![badge-ios](http://img.shields.io/badge/platform-ios-CDCDCD.svg?style=flat)
 ![badge-desktop](http://img.shields.io/badge/platform-desktop-DB413D.svg?style=flat)
-![badge-js](http://img.shields.io/badge/platform-js%2Fwasm-FDD835.svg?style=flat)
+![badge-js](http://img.shields.io/badge/platform-js-FDD835.svg?style=flat)
 
 # Gravatar Multiplatform
 
@@ -24,56 +24,99 @@ Feel free to fork it and make improvements, I'll keep up as best I can.
 
 # Features
 
-...describe features...
+- **Avatar URL Generation**: Support for SHA256 hashing, custom sizes, ratings, and default image fallbacks.
+- **Gravatar API v3 Support**: Full integration for uploading, retrieving, and managing avatars and user profiles.
+- **Compose Multiplatform (CMP) Components**: Ready-to-use UI components for displaying and editing Gravatar data. *Not published yet — see below.*
+- **Coil 3 Integration**: Efficient image loading across all CMP platforms.
 
 # Installation
 
-![Maven Central Version](https://img.shields.io/maven-central/v/io.github.aughtone/gravatar?style=flat)
+### Kotlin Multiplatform / Android (Gradle)
+Add the dependency to your version catalog or build file:
 
-Add the dependency to tyour library file:
-
-```gradle
-[versions]
-aughtone-gravatar = "${version}"
-
+```kotlin
 [libraries]
-aughtone-gravatar = { module = "io.github.aughtone:gravatar", version.ref = "aughtone-gravatar" }
+gravatar = { module = "io.github.aughtone:gravatar", version.ref = "gravatar" }
 ```
 
-Include the dependency in the module you want to use it with:
+> **`gravatar-compose` is not published yet.** The Compose Multiplatform module lives in this repository and is built and tested with every release, but its public API has not been reviewed, so it is not available from Maven Central. The UI examples below describe it for when it ships.
 
-```gradle
-implementation(libs.aughtone.gravatar)
+### iOS / Swift (Swift Package Manager or CocoaPods)
+The library is distributed as an XCFramework. You can integrate `AughtoneGravatarKit` directly into your Xcode project.
+
+### JavaScript
+The `js` target is published to Maven Central alongside the other platforms and is consumed through Gradle. There is no NPM package.
+
+# Usage by Platform
+
+### 📱 Android & Compose Multiplatform
+Use the `gravatar-compose` module for seamless integration with Compose (not published yet — see Installation):
+```kotlin
+GravatarImage(
+    email = "user@example.com",
+    size = 64.dp,
+    circle = true
+)
 ```
 
-Or if you are still old-school:
+### 🍎 iOS (Swift)
+The library is exported as a framework. You can use it in Swift as follows:
+```swift
+import AughtoneGravatarKit
 
-```gradle
-implementation("io.github.aughtone:gravatar:${version}")
+let url = Gravatar.shared.getAvatarUrl(email: "user@example.com")
+```
+
+### 🌐 JavaScript
+Depend on the `js` target from a Kotlin/JS project and use the same API as every other platform:
+```kotlin
+val api = GravatarApi()
+val profile = api.getProfile(emailOrHash = "user@example.com").getOrThrow()
 ```
 
 # Quick Start
 
-You can get a simple Gravatar url like this:
-
+### Basic Avatar URL
 ```kotlin
-val avatarUrl: String = gravatarUrl(email = "johndoe@example.com", name = "John Doe")
+val url = gravatarUrlOf(email = "user@example.com", name = "John Doe")
 ```
 
-The name property will be used to generate an initials image if no Gravatar is found, so you get an
-output like the one with the initials, since that address is not registered with Gravatar:
+### Using the API (v3)
+Every call returns a `Result`. A failed call carries a `GravatarApiException` with the HTTP status, so you can branch on the status rather than on the server's message text:
+```kotlin
+val api = GravatarApi(apiKey = "your_api_key")
 
-![image](https://gravatar.com/avatar/55e79200c1635b37ad31a378c39feb12f120f116625093a19bc32fff15041149?s=128&r=g&d=initials&initials=JD) ![image](https://gravatar.com/avatar/21ba0fe27eb6ba49492e49beca5431f5f2f053640b41af189bf184edb8b26b62?s=128&r=g&d=initials&initials=BP)
+api.getProfile(emailOrHash = "user@example.com").fold(
+    onSuccess = { profile -> println(profile.displayName) },
+    onFailure = { error ->
+        when {
+            error is GravatarApiException && error.isNotFound -> println("No profile for that address")
+            error is GravatarApiException && error.isUnauthorized -> println("Check your API key")
+            else -> throw error
+        }
+    }
+)
+```
+
+### UI Components (CMP)
+```kotlin
+// Display an avatar
+GravatarImage(email = "user@example.com", size = 64.dp)
+
+// Display a profile card
+GravatarProfileView(profile = userProfile)
+
+// Edit profile form
+GravatarEditProfileView(profile = userProfile, onSave = { request -> 
+    api.updateProfile(request = request)
+})
+```
 
 # Feedback
 
 Bugs can go into the issue tracker, but you are probably going to get faster support by creating a
-PR.   
+PR.
 
----
-## 🤖 AI-Assisted Development
-This library includes embedded, machine-readable "skills" to enhance the experience of developers using AI code assistants. These skills help the AI understand our library's APIs and best practices, leading to more accurate and idiomatic code suggestions.
+# License
 
-- **AI Skill Discovery**: Look for `META-INF/ai-skills/*.ai-skill.md`
-
-To learn how to add this capability to your own library, see our [AI Skill Publishing Standard](docs/standards/ai-skill-publishing.md).
+Licensed under the Apache License, Version 2.0 — see [LICENSE](LICENSE). Copyright and attribution are recorded in [NOTICE.md](NOTICE.md).
