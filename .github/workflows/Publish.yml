@@ -5,7 +5,10 @@ on:
   push:
     branches: [ "main" ]
   release:
-    types: [published]
+    types: [ published ]
+
+env:
+  GRADLE_OPTS: -Dorg.gradle.jvmargs="-Xmx4g -XX:MaxMetaspaceSize=512m -XX:+UseParallelGC"
 
 jobs:
   create-release:

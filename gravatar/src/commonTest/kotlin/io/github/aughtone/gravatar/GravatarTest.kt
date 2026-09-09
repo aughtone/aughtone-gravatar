@@ -110,7 +110,7 @@ class GravatarTest {
             )
                 .getOrThrow()
         assertEquals(
-            "https://gravatar.com/avatar/$testHash?s=1024&r=g&d=initials&name=John+Pappin",
+            "https://gravatar.com/avatar/$testHash?s=1024&r=g&d=initials&name=John%20Pappin",
             actual
         )
     }
@@ -130,5 +130,54 @@ class GravatarTest {
         )
     }
 
+    @ExperimentalStdlibApi
+    @Test
+    fun testProfileUrlJSON() = runTest {
+        val actual = gravatar.getProfileUrl(testEmail, ProfileFormat.JSON)
+        assertEquals("https://gravatar.com/$testHash.json", actual)
+    }
 
+    @ExperimentalStdlibApi
+    @Test
+    fun testProfileUrlMD() = runTest {
+        val actual = gravatar.getProfileUrl(testEmail, ProfileFormat.MD)
+        assertEquals("https://gravatar.com/$testHash.md", actual)
+    }
+
+    @ExperimentalStdlibApi
+    @Test
+    fun testQrCodeUrlWithNoParams() = runTest {
+        val actual = gravatar.getQrCodeUrl(testEmail)
+        assertEquals("https://api.gravatar.com/v3/qr-code/$testHash", actual)
+    }
+
+    @ExperimentalStdlibApi
+    @Test
+    fun testQrCodeUrlWithAllParams() = runTest {
+        val actual = gravatar.getQrCodeUrl(
+            emailOrHash = testEmail,
+            size = 300,
+            version = 3,
+            type = "user",
+            utmMedium = "app",
+            utmCampaign = "onboarding"
+        )
+        assertEquals(
+            "https://api.gravatar.com/v3/qr-code/$testHash?size=300&version=3&type=user&utm_medium=app&utm_campaign=onboarding",
+            actual
+        )
+    }
+
+    /**
+     * An identifier that is already hashed must not be hashed a second time.
+     * Regression: GravatarProfileView passes Profile.hash, which previously
+     * produced a URL for an account that does not exist.
+     */
+    @ExperimentalStdlibApi
+    @Test
+    fun testAvatarUrlAcceptsAnAlreadyHashedIdentifier() = runTest {
+        val fromEmail = gravatar.getAvatarUrl(email = testEmail).getOrThrow()
+        val fromHash = gravatar.getAvatarUrl(email = testHash).getOrThrow()
+        assertEquals(fromEmail, fromHash)
+    }
 }
