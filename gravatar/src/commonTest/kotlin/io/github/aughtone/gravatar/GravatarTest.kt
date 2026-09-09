@@ -8,8 +8,8 @@ import kotlin.test.assertEquals
 class GravatarTest {
 //    private val mainThreadSurrogate = newSingleThreadContext("UI thread")
 
-    private val testHash = "21ba0fe27eb6ba49492e49beca5431f5f2f053640b41af189bf184edb8b26b62"
-    private val testEmail = "brill@pappin.ca"
+    private val testHash = "973dfe463ec85785f5f95af5ba3906eedb2d931c24e69824a89ea65dba4e813b"
+    private val testEmail = "test@example.com"
     private val gravatar = Gravatar
 
     //    @Before
@@ -23,16 +23,6 @@ class GravatarTest {
 //        mainThreadSurrogate.close()
 //    }
 
-//    @ExperimentalStdlibApi
-//    @Test
-//    fun testUrl() = runTest {
-//        val actual = gravatar.getAvatarUrl(
-//            email = "johnpappin@gmail.com",
-//            sizeInPixels = 128,
-//            defaultImage = DefaultImage.Initials(initials = "JP")
-//        ).getOrThrow()
-//        assertEquals("", actual)
-//    }
 
     @ExperimentalStdlibApi
     @Test
@@ -106,11 +96,11 @@ class GravatarTest {
         val actual =
             gravatar.getAvatarUrl(
                 email = testEmail,
-                defaultImage = Gravatar.DefaultImage.Initials(name = "John Pappin")
+                defaultImage = Gravatar.DefaultImage.Initials(name = "Jane Doe")
             )
                 .getOrThrow()
         assertEquals(
-            "https://gravatar.com/avatar/$testHash?s=1024&r=g&d=initials&name=John%20Pappin",
+            "https://gravatar.com/avatar/$testHash?s=1024&r=g&d=initials&name=Jane%20Doe",
             actual
         )
     }
